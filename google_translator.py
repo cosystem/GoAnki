@@ -41,6 +41,19 @@ class TransCrawler:
             result = remaincont.split('<')[0]
             return result
 
+# This function is useful only when multithread is switch off
+# Because multithread will destroy the order later
+# If set() is slower than O(n), this can be used for the speed purpose
+# def del_dups(seq):
+#     '''function to delete duplicate while preserve order'''
+#     seen = {}
+#     newlist = []
+#     for item in seq:
+#         if item not in seen:
+#             seen[item] = True
+#             newlist.append(item)
+#     return newlist
+
 def transword_writeoutput(inword, outfilename):
     '''read a word string and save the input word and the output translation into a csv file'''
     inlang = 'de'
@@ -49,7 +62,7 @@ def transword_writeoutput(inword, outfilename):
     for lan in outlang:
         newword = TransCrawler(inlang, lan, inword)
         output_list.append(newword.getWord())
-    outstr = ",".join(output_list) + "\n"
+    outstr = ",".join(output_list) + ",\n"
     with open(outfilename, 'a', encoding='utf-8') as text_file:
         text_file.write(outstr)
 
@@ -59,7 +72,14 @@ datemark = datetime.datetime.now().strftime('%m.%Y')
 with open(inputfile, 'r', encoding = 'utf-8') as f:
     first_line = f.readline()
 inwordlist = first_line.split(datemark)[1].split()
-unique_inwordlist = list(set(inwordlist))
+
+# Delete duplicate in the input list
+# Preserve order is only useful when multithread is switch off
+# Not sure about the BigO of set(a_list), if it is O(n*log(n))
+# del_dups can be used to speed up
+#unique_inwordlist = del_dups(inwordlist) # BigO -> O(n)
+
+unique_inwordlist = list(set(inwordlist)) # BigO -> set(a_list): O(n*log(n)) or O(n)???
 
 # define output file name
 outfilename = os.path.splitext(inputfile)[0] + '_GoAnki.csv'
