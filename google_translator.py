@@ -53,6 +53,21 @@ class TransCrawler:
 #             seen[item] = True
 #             newlist.append(item)
 #     return newlist
+def html_decode(s):
+    """
+    Returns the ASCII decoded version of the given HTML string. This does
+    NOT remove normal HTML tags like <p>.
+    """
+    htmlCodes = (
+            ("'", '&#39;'),
+            ('"', '&quot;'),
+            ('>', '&gt;'),
+            ('<', '&lt;'),
+            ('&', '&amp;')
+        )
+    for code in htmlCodes:
+        s = s.replace(code[1], code[0])
+    return s
 
 def transword_writeoutput(inword, outfilename):
     '''read a word string and save the input word and the output translation into a csv file'''
@@ -63,8 +78,9 @@ def transword_writeoutput(inword, outfilename):
         newword = TransCrawler(inlang, lan, inword)
         output_list.append(newword.getWord())
     outstr = ",".join(output_list) + ",\n"
+    outstrparsed = html_decode(outstr)
     with open(outfilename, 'a', encoding='utf-8') as text_file:
-        text_file.write(outstr)
+        text_file.write(outstrparsed)
 
 # get the input word list
 inputfile = sys.argv[1]
@@ -81,7 +97,7 @@ if '_AutoNotes' in inputfile:
 # if the file is self-created then it contains multi-lines with empty lines
 # read the the lines and ignore the empty lines and the header (the line containing dateregex)
 else:
-    with open(inputfile, 'r') as f:
+    with open(inputfile, 'r', encoding = 'utf-8') as f:
         linesgen = (line.rstrip() for line in f)
         inwordlist = [line for line in linesgen if line and not dateregex.search(line)]
 
