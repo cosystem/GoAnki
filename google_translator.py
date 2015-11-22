@@ -2,7 +2,7 @@ __author__ = 'PGY'
 
 import sys
 import os.path
-import datetime
+import re
 import requests
 import threading
 
@@ -68,10 +68,11 @@ def transword_writeoutput(inword, outfilename):
 
 # get the input word list
 inputfile = sys.argv[1]
-datemark = datetime.datetime.now().strftime('%m.%Y')
+datemark = re.compile('\d{2}\.\d{2}\.\d{4}')
 with open(inputfile, 'r', encoding = 'utf-8') as f:
     first_line = f.readline()
-inwordlist = first_line.split(datemark)[1].split()
+fieldsepstr = datemark.search(first_line).group()
+inwordlist = first_line.split(fieldsepstr)[1].split()
 
 # Delete duplicate in the input list
 # Preserve order is only useful when multithread is switch off
