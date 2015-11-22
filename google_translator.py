@@ -68,11 +68,22 @@ def transword_writeoutput(inword, outfilename):
 
 # get the input word list
 inputfile = sys.argv[1]
-datemark = re.compile('\d{2}\.\d{2}\.\d{4}')
-with open(inputfile, 'r', encoding = 'utf-8') as f:
-    first_line = f.readline()
-fieldsepstr = datemark.search(first_line).group()
-inwordlist = first_line.split(fieldsepstr)[1].split()
+
+dateregex = re.compile('\d{2}\.\d{2}\.\d{4}')
+# if the file is saved from AutoNotes then it is a string
+# read a string from a file
+if '_AutoNotes' in inputfile:
+    with open(inputfile, 'r', encoding = 'utf-8') as f:
+        first_line = f.readline()
+        fieldsepstr = dateregex.search(first_line).group()
+        inwordlist = first_line.split(fieldsepstr)[1].split()
+
+# if the file is self-created then it contains multi-lines with empty lines
+# read the the lines and ignore the empty lines and the header (the line containing dateregex)
+else:
+    with open(inputfile, 'r') as f:
+        linesgen = (line.rstrip() for line in f)
+        inwordlist = [line for line in linesgen if line and not dateregex.search(line)]
 
 # Delete duplicate in the input list
 # Preserve order is only useful when multithread is switch off
