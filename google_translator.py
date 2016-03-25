@@ -77,7 +77,7 @@ def transword_writeoutput(inword, outfilename):
     for lan in outlang:
         newword = TransCrawler(inlang, lan, inword)
         output_list.append(newword.getWord())
-    outstr = ",".join(output_list) + ",\n"
+    outstr = "/".join(output_list) + "/\n"
     outstrparsed = html_decode(outstr)
     with open(outfilename, 'a', encoding='utf-8') as text_file:
         text_file.write(outstrparsed)
